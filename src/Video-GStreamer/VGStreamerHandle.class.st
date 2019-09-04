@@ -15,6 +15,17 @@ VGStreamerHandle class >> outputSinkName [
 ]
 
 { #category : #API }
+VGStreamerHandle >> currentTime [
+	| buffer |
+	buffer := FFIInt64 newBuffer.
+	^ (self handle queryDuration: buffer format: GstFormat GST_FORMAT_TIME)
+		ifTrue: [ | uSec | 
+			uSec := buffer integerAt: 1 size: FFIInt64 externalTypeSize signed: false.
+			GstClock GST_TIME_AS_SECONDS: uSec ]
+		ifFalse: [ nil ].
+]
+
+{ #category : #API }
 VGStreamerHandle >> drawRectangle: aRectangle [
 	| videoOverlay |
 	videoOverlay := GstVideoOverlay fromHandle: self getOutputSink.
@@ -23,18 +34,18 @@ VGStreamerHandle >> drawRectangle: aRectangle [
 
 { #category : #API }
 VGStreamerHandle >> duration [
-	| pointer |
-	pointer := ExternalAddress allocate: FFIInt64 externalTypeSize.
-	^ (self handle queryDuration: pointer format: GstFormat GST_FORMAT_TIME)
+	| buffer |
+	buffer := FFIInt64 newBuffer.
+	^ (self handle queryDuration: buffer format: GstFormat GST_FORMAT_TIME)
 		ifTrue: [ | uSec | 
-			uSec := pointer integerAt: 1 size: FFIInt64 externalTypeSize signed: false.
+			uSec := buffer integerAt: 1 size: FFIInt64 externalTypeSize signed: false.
 			GstClock GST_TIME_AS_SECONDS: uSec ]
 		ifFalse: [ nil ].
 ]
 
 { #category : #accessing }
 VGStreamerHandle >> getOutputSink [
-	^ GstBaseSink fromHandle: (handle getByName: self outputSinkName)
+	^ (handle asGstBin getByName: self outputSinkName) asGstBaseSink
 ]
 
 { #category : #constants }
@@ -54,9 +65,7 @@ VGStreamerHandle >> play [
 
 { #category : #API }
 VGStreamerHandle >> resize: aRectangle [
-	| videoOverlay |
-	videoOverlay := handle getByName: self video name.
-	videoOverlay setRenderRectangle: aRectangle
+	self getOutputSink asGstVideoOverlay setRenderRectangle: aRectangle
 ]
 
 { #category : #API }
@@ -79,9 +88,7 @@ VGStreamerHandle >> screenshot: aFilename [
 
 { #category : #API }
 VGStreamerHandle >> setWindow: aWindowId [
-	| videoOverlay |
-	videoOverlay := GstVideoOverlay fromHandle: self getOutputSink.
-	videoOverlay setWindowHandle: (ExternalAddress fromAddress: aWindowId).
+	self getOutputSink asGstVideoOverlay setWindowHandle: (ExternalAddress fromAddress: aWindowId).
 ]
 
 { #category : #API }

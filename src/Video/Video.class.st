@@ -20,7 +20,7 @@ Video class >> fromFile: aFilename [
 
 { #category : #'instance creation' }
 Video class >> fromIP: ipAddress port: aNumber [
-	^ self new type: (NetworkVideo new initIp: ipAddress port: aNumber)
+	^ self withType: (NetworkVideo new initIp: ipAddress port: aNumber)
 ]
 
 { #category : #'instance creation' }
@@ -33,7 +33,7 @@ Video class >> test [
 	<script>
 	| video | 
 	video := self withType: (TestVideo new
-			pattern: 'snow';
+			pattern: 1;
 			framerate: 60;
 			extent: 800@600;
 			yourself).
@@ -43,12 +43,12 @@ Video class >> test [
 
 { #category : #'instance creation' }
 Video class >> withType: aVideoType [
-	^ self new initWith: aVideoType
+	^ self basicNew initialize; initWith: aVideoType
 ]
 
 { #category : #API }
 Video >> currentTime [
-	self flag: 'toImplement'
+	^ videoHandle currentTime
 ]
 
 { #category : #API }
@@ -136,4 +136,9 @@ Video >> time: aDuration [
 { #category : #API }
 Video >> timePercent: aFloat [
 	self flag: 'toImplement'
+]
+
+{ #category : #accessing }
+Video >> type [
+	^ type ifNil: [ self error: 'Video must have a type.' ]
 ]

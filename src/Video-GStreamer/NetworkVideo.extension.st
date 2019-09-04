@@ -1,13 +1,15 @@
-Extension { #name : #FileVideo }
+Extension { #name : #NetworkVideo }
 
 { #category : #'*Video-GStreamer' }
-FileVideo >> launchGStreamerVideo [
+NetworkVideo >> launchGStreamerVideo [
 	| stream |
 	GStreamer isInit ifFalse: [ GStreamer init ].
 			
 	stream := WriteStream with: String new.
-	stream << 'filesrc location=' << filename
-			 << ' ! qtdemux name=demux demux. ! queue ! decodebin ! videoconvert ! '
+	stream << 'udpsrc uri=udp://' << ip
+			 << ':' << port printString
+			 << ' ! video/mpegts ! tsdemux name=demux ! video/x-h264 ! queue ! decodebin ! videoconvert'
+			 << ' ! videoscale ! '
 			 << GStreamer osSpecificVideoSink 
 			 << ' name='
 			 << VGStreamerHandle outputSinkName.
