@@ -8,7 +8,7 @@ Playing video using a Pharo GStreamer binding.
 
 ```smalltalk
 Metacello new
-   baseline: 'PharoVideo';
+   baseline: 'Video';
    repository: 'github://OpenSmock/PharoVideo:main';
    load.
 ```
