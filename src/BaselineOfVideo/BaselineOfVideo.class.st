@@ -13,7 +13,7 @@ BaselineOfVideo >> baseline: spec [
 			"GStreamer"
 			spec
 				baseline: 'GStreamer'
-				with: [ spec repository: 'github://OpenSmock/Pharo-GStreamer/src' ].
+				with: [ spec repository: 'github://OpenSmock/PharoGStreamer:main' ].
 
 			"Video"
 			spec package: 'Video'.
